@@ -14,7 +14,7 @@ def get_upcoming_birthdays(users):
         days_difference = (birthday_this_year - today).days
         
         if 0 <= days_difference <= 7:
-            if birthday_this_year.weekday() >= 5:  # 5 - субота, 6 - неділя
+            if birthday_this_year.weekday() >= 5:  
                 birthday_this_year += timedelta(days=(7 - birthday_this_year.weekday()))
             
             upcoming_birthdays.append({
@@ -24,7 +24,7 @@ def get_upcoming_birthdays(users):
     
     return upcoming_birthdays
 
-# Приклад використання
+
 users = [
     {"name": "Alexander Ivanov", "birthday": "1990.07.10"},
     {"name": "Marina Petrov", "birthday": "1985.01.11"},
