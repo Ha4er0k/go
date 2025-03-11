@@ -12,3 +12,4 @@ def get_numbers_ticket(min_num, max_num, quantity):
 
 print(get_numbers_ticket(1, 1000, 10))
 print(get_numbers_ticket(10, 12, 11))
+#
