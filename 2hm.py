@@ -9,7 +9,8 @@ def get_numbers_ticket(min_num, max_num, quantity):
     
     numbers = random.sample(range(min_num, max_num + 1), quantity)
     return sorted(numbers)
-
-print(get_numbers_ticket(1, 1000, 10))
-print(get_numbers_ticket(10, 12, 11))
+lottery_numbers1 = get_numbers_ticket(1,1000,10)
+lottery_numbers2 = get_numbers_ticket(11,12,10)
+print ("Ваші лотерейні номерки:",lottery_numbers1)
+print ("Ваші лотерейні номерки:",lottery_numbers2)
 #
