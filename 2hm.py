@@ -13,4 +13,3 @@ lottery_numbers1 = get_numbers_ticket(1,1000,10)
 lottery_numbers2 = get_numbers_ticket(11,12,10)
 print ("Ваші лотерейні номерки:",lottery_numbers1)
 print ("Ваші лотерейні номерки:",lottery_numbers2)
-#

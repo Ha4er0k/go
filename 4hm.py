@@ -24,7 +24,6 @@ def get_upcoming_birthdays(users):
     
     return upcoming_birthdays
 
-
 users = [
     {"name": "Alexander Ivanov", "birthday": "1990.07.10"},
     {"name": "Marina Petrov", "birthday": "1985.01.11"},
@@ -49,6 +48,7 @@ users = [
 ]
 
 
+
+
 upcoming_birthdays = get_upcoming_birthdays(users)
 print("Список привітань на цьому тижні:", upcoming_birthdays)
-#
