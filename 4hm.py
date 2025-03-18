@@ -1,54 +1,72 @@
-from datetime import datetime, timedelta
+def parse_input(user_input):
+    cmd, *args = user_input.split() #команда розбиває введений рядок на слова
+    cmd = cmd.strip().lower()  #команда видаляє зайві пробіли і переводимо команду в нижній регістр
+    return cmd, *args 
 
-def get_upcoming_birthdays(users):
-    today = datetime.today().date()
-    upcoming_birthdays = []
+#функція для додавання контакту
+def add_contact(args, contacts):
+    name, phone = args
+    contacts[name] = phone
+    return "Contact added."
+
+#функція для зміни номера телефону існуючого контакту
+def change_contact(args, contacts):
+    name, phone = args
+    if name in contacts:
+        contacts[name] = phone  #оновлює номер
+        return "Contact updated."
+    else:
+        return "Contact not found."
+
+#функція для отримання номера телефону за ім'ям
+def show_phone(args, contacts):
+    name = args[0]
+    return contacts.get(name, "Contact not found.")  
+
+#функція для виведення всіх контактів
+def show_all(contacts):
+    if contacts:
+        return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())  #команда формує список контактів
+    return "No contacts found."
+
+def main():
+    contacts = {}  #порожній словник для контактів
+    print("Welcome to the assistant bot!")
+
+    while True:
+        user_input = input("Enter a command: ")
+        command, *args = parse_input(user_input)
+
+        if command in ["close", "exit"]:
+            print("Good bye!")
+            break  #вихід з циклу при командах "close" або "exit"
+
+        elif command == "hello":
+            print("Hello,how can I help you?")
+
+        elif command == "add" and len(args) == 2:
+            print(add_contact(args, contacts))  
+
+        elif command == "change" and len(args) == 2:
+            print(change_contact(args, contacts)) 
+
+        elif command == "phone" and len(args) == 1:
+            print(show_phone(args, contacts))
+
+        elif command == "all":
+            print(show_all(contacts))
+
+        else:
+            print("Invalid command.")  #якщо невідома команда
+
+if __name__ == "__main__":
+    main()
+
     
-    for user in users:
-        birthday = datetime.strptime(user["birthday"], "%Y.%m.%d").date()
-        birthday_this_year = birthday.replace(year=today.year)
-        
-        if birthday_this_year < today:
-            birthday_this_year = birthday_this_year.replace(year=today.year + 1)
-        
-        days_difference = (birthday_this_year - today).days
-        
-        if 0 <= days_difference <= 7:
-            if birthday_this_year.weekday() >= 5:  
-                birthday_this_year += timedelta(days=(7 - birthday_this_year.weekday()))
-            
-            upcoming_birthdays.append({
-                "name": user["name"],
-                "congratulation_date": birthday_this_year.strftime("%Y.%m.%d")
-            })
-    
-    return upcoming_birthdays
-
-users = [
-    {"name": "Alexander Ivanov", "birthday": "1990.07.10"},
-    {"name": "Marina Petrov", "birthday": "1985.01.11"},
-    {"name": "Igor Sidorov", "birthday": "1992.03.12"},
-    {"name": "Natalie Kovalenko", "birthday": "1993.09.08"},
-    {"name": "Vasyl Melnyk", "birthday": "1988.03.01"},
-    {"name": "Elena Tkachenko", "birthday": "1995.03.17"},
-    {"name": "Dmitry Shevchenko", "birthday": "1991.01.21"},
-    {"name": "Anna Hrytsenko", "birthday": "1994.12.12"},
-    {"name": "Serhiy Bondar", "birthday": "1987.07.07"},
-    {"name": "Julia Moroz", "birthday": "1996.03.12"},
-    {"name": "Pavlo Dmytrenko", "birthday": "1993.01.20"},
-    {"name": "Katherine Zhuk", "birthday": "1992.05.30"},
-    {"name": "Maxim Lysenko", "birthday": "1989.09.22"},
-    {"name": "Svitlana Romanenko", "birthday": "1997.03.10"},
-    {"name": "Andrew Kravchenko", "birthday": "1990.02.24"},
-    {"name": "Oksana Polishchuk", "birthday": "1985.11.15"},
-    {"name": "Eugene Havryliuk", "birthday": "1986.08.24"},
-    {"name": "Tatiana Oliynyk", "birthday": "1994.03.15"},
-    {"name": "Roman Stepanenko", "birthday": "1991.02.11"},
-    {"name": "Inna Martynenko", "birthday": "1995.07.01"},
-]
-
-
-
-
-upcoming_birthdays = get_upcoming_birthdays(users)
-print("Список привітань на цьому тижні:", upcoming_birthdays)
+#команди для бота:
+#hello = виводить привітання.
+#add [name] [phone] = додає контакт.
+#change [name] [new phone] = змінює номер контакту.
+#phone [name] = виводить номер телефону.
+#all = показує всі контакти.
+#close/exit = завершує роботу
