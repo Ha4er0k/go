@@ -1,41 +1,67 @@
-import os  
-from pathlib import Path  
-from colorama import init, Fore, Style  
+import sys
+import os
 
-def print_directory_tree(directory, indent=""):
-    try:
-        #тут отримую список всіх файлів і папок у вказаній директорії,та сортую їх так щоб спочатку йшли папки а потім файли
-        entries = sorted(Path(directory).iterdir(), key=lambda e: (not e.is_dir(), e.name.lower()))
+def create_log_file(file_path):
+    logs = """2024-01-22 08:30:01 INFO User logged in successfully.
+2024-01-22 08:45:23 DEBUG Attempting to connect to the database.
+2024-01-22 09:00:45 ERROR Database connection failed.
+2024-01-22 09:15:10 INFO Data export completed.
+2024-01-22 10:30:55 WARNING Disk usage above 80%.
+2024-01-22 11:05:00 DEBUG Starting data backup process.
+2024-01-22 11:30:15 ERROR Backup process failed.
+2024-01-22 12:00:00 INFO User logged out.
+2024-01-22 12:45:05 DEBUG Checking system health.
+2024-01-22 13:30:30 INFO Scheduled maintenance."""
+    with open(file_path, "w") as file:
+        file.write(logs)
 
-        for entry in entries:
-            if entry.is_dir():  #якщо це папка
-                print(f"{indent}{Fore.BLUE}📂 {entry.name}{Style.RESET_ALL}")  #вивід синім кольором
-                print_directory_tree(entry, indent + " ┃ ")  #виулик рекурсії для вмісту папки
-            else:  #якщо це файл
-                print(f"{indent}{Fore.GREEN}📜 {entry.name}{Style.RESET_ALL}")  #вивід зеленим кольором
-    except PermissionError:
-        #якщо немає доступу до директорії, вивід повідомлення буде червоним кольором
-        print(f"{indent}{Fore.RED}Доступ заборонено: {directory}{Style.RESET_ALL}")
+def parse_log_line(line):
+    parts = line.split(" ", 3)
+    if len(parts) < 4:
+        return None
+    return {"date": parts[0], "time": parts[1], "level": parts[2], "message": parts[3]}
+
+def load_logs(file_path):
+    logs = []
+    with open(file_path, "r") as file:
+        for line in file:
+            log_entry = parse_log_line(line.strip())
+            if log_entry:
+                logs.append(log_entry)
+    return logs
+
+def count_logs_by_level(logs):
+    counts = {}
+    for log in logs:
+        counts[log["level"]] = counts.get(log["level"], 0) + 1
+    return counts
+
+def display_log_counts(counts):
+    print("Рівень логування | Кількість")
+    print("-" * 25)
+    for level, count in counts.items():
+        print(f"{level:<15} | {count}")
+
+def filter_logs_by_level(logs, level):
+    return [log for log in logs if log["level"].lower() == level.lower()]
 
 def main():
-    init(autoreset=True) 
-
-    directory = Path(r"C:/шлях/до/вашої/директорії") # замість /шлях/до/вашої/директорії треба вписати шлях до своєї директорії
+    log_file = "logs.txt"
+    create_log_file(log_file)
+    logs = load_logs(log_file)
+    log_counts = count_logs_by_level(logs)
+    display_log_counts(log_counts)
     
-    #перевірка,чи існує така директорія
-    if not directory.exists():
-        print(f"{Fore.RED}Помилка: Вказана директорія не існує!{Style.RESET_ALL}")
-        return
-    
-    #перевірка,чи це дійсно директорія,а не файл
-    if not directory.is_dir():
-        print(f"{Fore.RED}Помилка: Вказаний шлях не є директорією!{Style.RESET_ALL}")
-        return 
-
-    #вивід назви директорії жовтим кольором
-    print(f"{Fore.YELLOW}📦 {directory.resolve().name}{Style.RESET_ALL}")
-
-    print_directory_tree(directory)
+    if len(sys.argv) > 1:
+        level = sys.argv[1]
+        filtered_logs = filter_logs_by_level(logs, level)
+        if filtered_logs:
+            print(f"\nДeтaлi логів для рівня '{level.upper()}':")
+            for log in filtered_logs:
+                print(f"{log['date']} {log['time']} - {log['message']}")
+        else:
+            print(f"\nЗаписів рівня '{level.upper()}' не знайдено.")
 
 if __name__ == "__main__":
     main()
+

@@ -1,36 +1,58 @@
-def parse_input(user_input):
-    cmd, *args = user_input.split() #команда розбиває введений рядок на слова
-    cmd = cmd.strip().lower()  #команда видаляє зайві пробіли і переводимо команду в нижній регістр
-    return cmd, *args 
+def input_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and phone please."
+        except IndexError:
+            return "Give me name please."
+        except KeyError:
+            return "Contact not found."
+        except Exception as e:
+            return f"An error occurred: {e}"
+    return inner
 
-#функція для додавання контакту
+
+def parse_input(user_input):
+    cmd, *args = user_input.split() 
+    cmd = cmd.strip().lower()  
+    return cmd, *args
+
+
+@input_error
 def add_contact(args, contacts):
+    if len(args) != 2:
+        raise ValueError
     name, phone = args
     contacts[name] = phone
     return "Contact added."
 
-#функція для зміни номера телефону існуючого контакту
+@input_error
 def change_contact(args, contacts):
+    if len(args) != 2:
+        raise ValueError
     name, phone = args
     if name in contacts:
-        contacts[name] = phone  #оновлює номер
+        contacts[name] = phone  
         return "Contact updated."
     else:
-        return "Contact not found."
+        raise KeyError
 
-#функція для отримання номера телефону за ім'ям
+@input_error
 def show_phone(args, contacts):
+    if len(args) != 1:
+        raise ValueError
     name = args[0]
-    return contacts.get(name, "Contact not found.")  
+    return contacts.get(name, "Contact not found.")
 
-#функція для виведення всіх контактів
+@input_error
 def show_all(contacts):
-    if contacts:
-        return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())  #команда формує список контактів
-    return "No contacts found."
+    if not contacts:
+        raise IndexError
+    return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())
 
 def main():
-    contacts = {}  #порожній словник для контактів
+    contacts = {}  
     print("Welcome to the assistant bot!")
 
     while True:
@@ -39,34 +61,32 @@ def main():
 
         if command in ["close", "exit"]:
             print("Good bye!")
-            break  #вихід з циклу при командах "close" або "exit"
+            break  
 
         elif command == "hello":
-            print("Hello,how can I help you?")
+            print("Hello, how can I help you?")
 
-        elif command == "add" and len(args) == 2:
-            print(add_contact(args, contacts))  
+        elif command == "add":
+            print(add_contact(args, contacts))
 
-        elif command == "change" and len(args) == 2:
-            print(change_contact(args, contacts)) 
+        elif command == "change":
+            print(change_contact(args, contacts))
 
-        elif command == "phone" and len(args) == 1:
+        elif command == "phone":
             print(show_phone(args, contacts))
 
         elif command == "all":
             print(show_all(contacts))
 
         else:
-            print("Invalid command.")  #якщо невідома команда
+            print("Invalid command.")
 
 if __name__ == "__main__":
     main()
-
-    
-#команди для бота:
-#hello = виводить привітання.
-#add [name] [phone] = додає контакт.
-#change [name] [new phone] = змінює номер контакту.
-#phone [name] = виводить номер телефону.
-#all = показує всі контакти.
-#close/exit = завершує роботу
+#hello - Виводить привітальне повідомлення.
+#add [name] [phone] - Додає новий контакт з вказаним ім'ям та номером телефону.
+#change [name] [new phone] - Змінює номер телефону існуючого контакту за вказаним ім'ям.
+#phone [name] - Виводить номер телефону контакту, який відповідає вказаному імені.
+#all - Виводить список усіх контактів у системі, разом з їх іменами та номерами телефонів.
+#help - Показує список доступних команд і їх пояснення.
+#close або exit - Завершує роботу програми та виводить повідомлення про завершення розмови.

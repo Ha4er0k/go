@@ -1,44 +1,15 @@
-import os
-filename = "cats_file.txt" #створив файл та дав йому ім'я
+import re
+from typing import Callable
 
-#перевірка, чи файл вже існує
-if not os.path.exists(filename):  
-    with open(filename, "w", encoding="utf-8") as file:  #("w") - відкриття файлу в режимі запису,"write"
-        file.write("60b90c1c13067a15887e1ae1,Tayson,3\n")
-        file.write("60b90c2413067a15887e1ae2,Vika,1\n")
-        file.write("60b90c2e13067a15887e1ae3,Barsik,2\n")
-        file.write("60b90c3b13067a15887e1ae4,Simon,12\n")
-        file.write("60b90c4613067a15887e1ae5,Tessi,5\n")
+def generator_numbers(text: str):
+#Генерує дійсні числа з тексту
+    for match in re.finditer(r'\b\d+\.\d+\b|\b\d+\b', text):
+        yield float(match.group())
 
-def get_cats_info(path):
+def sum_profit(text: str, func: Callable):
+#Обчислює суму всіх чисел у тексті, використовуючи передану функцію-генератор
+    return sum(func(text))
 
-    cats_list = []  #пустий список для інформації про киць
-
-    try:
-        #("r") - відкриття файлу в режимі читання
-        with open(path, "r", encoding="utf-8") as file:
-            for line in file:
-                parts = line.strip().split(",")  #видаляє зайві пробіли та розділяє рядок за комами
-                if len(parts) == 3:  #перевірка, чи є всі три частини (id, ім'я, вік)
-                    cat_info = {
-                        "id": parts[0],   #унікальний ідентифікатор киці
-                        "name": parts[1], #ім'я киці
-                        "age": parts[2]   #вік киці
-                    }
-                    cats_list.append(cat_info)  #додаю словник до списку
-
-        return cats_list
-
-    #виведе помилку в разі якщо файл не знайдено
-    except FileNotFoundError:
-        print("Помилка: Файл не знайдено.")
-        return []
-
-    #виведе помилку в разі якщо некоректні дані
-    except Exception as e:
-        print(f"Помилка при читанні файлу: {e}")
-        return []
-
-cats_info = get_cats_info(filename)
-
-print(cats_info)
+text = "Загальний дохід працівника складається з декількох частин: 1000.01 як основний дохід, доповнений додатковими надходженнями 27.45 і 324.00 доларів."
+total_income = sum_profit(text, generator_numbers)
+print(f"Загальний дохід: {total_income}")
