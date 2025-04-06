@@ -94,18 +94,16 @@ class AddressBook(UserDict):
             return "No contacts available."
         return "\n".join(str(record) for record in self.data.values())
 
-# Серіалізація: Збереження даних у файл
 def save_data(book, filename="addressbook.pkl"):
     with open(filename, "wb") as f:
         pickle.dump(book, f)
 
-# Десеріалізація: Завантаження даних з файлу
 def load_data(filename="addressbook.pkl"):
     try:
         with open(filename, "rb") as f:
             return pickle.load(f)
     except FileNotFoundError:
-        return AddressBook()  # Повертаємо нову книгу, якщо файл не знайдено
+        return AddressBook()  
 
 def input_error(func):
     def wrapper(*args, **kwargs):
@@ -159,7 +157,7 @@ def parse_input(user_input):
     return parts[0], parts[1:]
 
 def main():
-    # Завантажуємо дані з файлу
+    
     book = load_data()
 
     print("Welcome to the assistant bot!")
@@ -169,7 +167,7 @@ def main():
 
         if command in ["close", "exit"]:
             print("Good bye!")
-            # Зберігаємо дані перед виходом
+            
             save_data(book)
             break
 
