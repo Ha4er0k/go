@@ -31,3 +31,5 @@ examples = [
 for expr in examples:
     result = check_brackets(expr)
     print(f"{expr}: {result}")
+
+

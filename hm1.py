@@ -22,7 +22,7 @@ def process_request():
         #Видалення з черги
         request = request_queue.get()
         print(f"[✔] Обробляється: {request}")
-        time.sleep(random.uniform(0.5, 1.5))  # Імітація часу обробки
+        time.sleep(random.uniform(0.5, 1.5))  #Імітація часу обробки
         print(f"[✓] Завершено: {request}")
     else:
         print("[!] Черга порожня. Немає заявок для обробки.")
@@ -41,3 +41,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+   
+   

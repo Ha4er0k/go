@@ -25,3 +25,7 @@ test_strings = [
 for s in test_strings:
     result = is_palindrome(s)
     print(f"'{s}' → {'паліндром' if result else 'не паліндром'}")
+   
+   
+   
+   
