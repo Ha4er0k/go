@@ -1,61 +1,85 @@
-import os
-import shutil
-import argparse
+import random
+import timeit
+import matplotlib.pyplot as plt
+import heapq
 
-def copy_and_sort_files(src_dir, dest_dir="dist"):
-    # Отримання абсолютного шляху до директорії призначення
-    abs_dest_dir = os.path.abspath(dest_dir)
+def insertion_sort(arr):
+    a = arr.copy()
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and key < a[j]:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+    return a
 
-    # Рекурсивний обхід усіх підкаталогів та файлів у вихідній директорії
-    for root, dirs, files in os.walk(src_dir):
-        # Виключення директорії призначення з обходу, щоб не копіювати вміст самої себе
-        dirs[:] = [d for d in dirs if os.path.abspath(os.path.join(root, d)) != abs_dest_dir]
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
 
-        
-        for file in files:
-            file_path = os.path.join(root, file)
+def merge(left, right):
+    result = []
+    l = r = 0
+    while l < len(left) and r < len(right):
+        if left[l] <= right[r]:
+            result.append(left[l])
+            l += 1
+        else:
+            result.append(right[r])
+            r += 1
+    result.extend(left[l:])
+    result.extend(right[r:])
+    return result
 
-            #Пропускаємо файли, які вже знаходяться в директорії призначення (щоб уникнути зациклення)
-            if abs_dest_dir in os.path.abspath(file_path):
-                continue
+sizes = [100, 500, 1000, 2000]
+results = {"Insertion Sort": [], "Merge Sort": [], "Timsort (sorted)": []}
 
-            #Отримання розширення файлу
-            ext = os.path.splitext(file)[1].lower().strip('.')
-            if not ext:
-                ext = 'no_extension' 
+for size in sizes:
+    data = [random.randint(0, 10000) for _ in range(size)]
 
-            #Створення піддиректорії в dest, яка відповідає розширенню
-            target_dir = os.path.join(dest_dir, ext)
-            os.makedirs(target_dir, exist_ok=True) 
+    time_insertion = timeit.timeit(lambda: insertion_sort(data), number=1)
+    time_merge = timeit.timeit(lambda: merge_sort(data), number=1)
+    time_timsort = timeit.timeit(lambda: sorted(data), number=1)
 
-            #Формування повного шляху до місця призначення
-            target_file_path = os.path.join(target_dir, file)
+    results["Insertion Sort"].append(time_insertion)
+    results["Merge Sort"].append(time_merge)
+    results["Timsort (sorted)"].append(time_timsort)
 
-            #Копіювання файлу та обробка можливих помилок
-            try:
-                shutil.copy2(file_path, target_file_path) 
-                print(f"Копійовано: {file_path} → {target_file_path}")
-            except Exception as e:
-                print(f"Помилка копіювання файлу '{file_path}': {e}")
 
-def main():
-    #Налаштування парсера аргументів командного рядка
-    parser = argparse.ArgumentParser(description="Рекурсивне копіювання та сортування файлів за розширеннями.")
-    parser.add_argument("src", help="Шлях до вихідної директорії")
-    parser.add_argument("dest", nargs='?', default="dist", help="Шлях до директорії призначення (за замовчуванням: dist)")
-    args = parser.parse_args()
+plt.figure(figsize=(10, 6))
+for label, timings in results.items():
+    plt.plot(sizes, timings, marker="o", label=label)
 
-    #Перевірка наявності вихідної директорії
-    if not os.path.isdir(args.src):
-        print(f"Вихідна директорія '{args.src}' не існує або не є директорією.")
-        return
+plt.title("Порівняння часу виконання алгоритмів сортування")
+plt.xlabel("Розмір масиву")
+plt.ylabel("Час виконання (сек.)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
-    #Створення директорії призначення
-    os.makedirs(args.dest, exist_ok=True)
 
-    #Виконання копіювання та сортування
-    copy_and_sort_files(args.src, args.dest)
-    print("Завершено.")
+def merge_k_lists(lists):
+    heap = []
+    for i, lst in enumerate(lists):
+        if lst:
+            heapq.heappush(heap, (lst[0], i, 0))
 
-if __name__ == "__main__":
-    main()
+    result = []
+    while heap:
+        val, list_idx, element_idx = heapq.heappop(heap)
+        result.append(val)
+        if element_idx + 1 < len(lists[list_idx]):
+            next_tuple = (lists[list_idx][element_idx + 1], list_idx, element_idx + 1)
+            heapq.heappush(heap, next_tuple)
+    return result
+
+
+lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
+merged_list = merge_k_lists(lists)
+print("Відсортований список:", merged_list)
