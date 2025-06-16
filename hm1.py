@@ -31,15 +31,14 @@ class HashTable:
         for i, pair in enumerate(bucket):
             if pair[0] == key:
                 del bucket[i]
-                return True  # Успішно видалено
-        return False  # Ключ не знайдено
+                return True  #Успішно видалено
+        return False  #Ключ не знайдено
 
-# Тестуємо нашу хеш-таблицю:
 H = HashTable(5)
 H.insert("apple", 10)
 H.insert("orange", 20)
 H.insert("banana", 30)
 
-print(H.get("apple"))    # Виведе: 10
-H.delete("apple")        # Видалимо "apple"
-print(H.get("apple"))    # Виведе: None
+print(H.get("apple"))    #Виведе: 10
+H.delete("apple")        #Видалимо "apple"
+print(H.get("apple"))    #Виведе: None
