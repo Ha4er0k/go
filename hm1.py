@@ -42,3 +42,5 @@ H.insert("banana", 30)
 print(H.get("apple"))    #Виведе: 10
 H.delete("apple")        #Видалимо "apple"
 print(H.get("apple"))    #Виведе: None
+
+
