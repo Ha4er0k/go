@@ -1,46 +1,47 @@
-class HashTable:
-    def __init__(self, size):
-        self.size = size
-        self.table = [[] for _ in range(self.size)]
+import networkx as nx
+import matplotlib.pyplot as plt
 
-    def hash_function(self, key):
-        return hash(key) % self.size
+G = nx.Graph()
 
-    def insert(self, key, value):
-        key_hash = self.hash_function(key)
-        key_value = [key, value]
+# Реальні станції метро в Амстердамі згідно з офіційною схемою
+lines = {
+    "50": ["Isolatorweg","Sloterdijk","De Vlugtlaan","Jan van Galenstraat",
+           "Postjesweg","Lelylaan","Heemstedestraat","Henk Sneevlietweg",
+           "Amstelveenseweg","Zuid","RAI","Overamstel","Van der Madeweg",
+           "Duivendrecht","Strandvliet","Bijlmer ArenA","Bullewijk",
+           "Holendrecht","Reigersbos","Gein"],
+    "51": ["Isolatorweg","Sloterdijk","Lelylaan","Heemstedestraat",
+           "Henk Sneevlietweg","Amstelveenseweg","Zuid","Centraal",
+           "Amstel"],
+    "52": ["Noord","Noorderpark","Centraal","Rokin","Vijzelgracht",
+           "De Pijp","Europaplein","Zuid"],
+    "53": ["Centraal","Nieuwmarkt","Waterlooplein","Weesperplein",
+           "Wibautstraat","Amstel","Spaklerweg","Van der Madeweg",
+           "Venserpolder","Diemen Zuid","Verrijn Stuartweg",
+           "Ganzenhoef","Kraaiennest","Gaasperplas"],
+    "54": ["Centraal","Nieuwmarkt","Waterlooplein","Weesperplein",
+           "Wibautstraat","Amstel","Spaklerweg","Van der Madeweg",
+           "Duivendrecht","Strandvliet","Bijlmer ArenA","Bullewijk",
+           "Holendrecht","Reigersbos","Gein"]
+}
 
-        for pair in self.table[key_hash]:
-            if pair[0] == key:
-                pair[1] = value
-                return True
+# Додавання ребер між послідовними станціями кожної лінії
+for stations in lines.values():
+    for i in range(len(stations) - 1):
+        G.add_edge(stations[i], stations[i + 1])
 
-        self.table[key_hash].append(key_value)
-        return True
+# 🔍 Візуалізація графа
+plt.figure(figsize=(16, 10))
+pos = nx.spring_layout(G, seed=42)
+nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray',
+        node_size=400, font_size=8)
+plt.title("Мережа метро Амстердама (реальні станції)", fontsize=14)
+plt.show()
+# Базові метрики
+print("🔢 Кількість станцій:", G.number_of_nodes())
+print("🔗 Кількість з'єднань:", G.number_of_edges())
 
-    def get(self, key):
-        key_hash = self.hash_function(key)
-        for pair in self.table[key_hash]:
-            if pair[0] == key:
-                return pair[1]
-        return None
-
-    def delete(self, key):
-        key_hash = self.hash_function(key)
-        bucket = self.table[key_hash]
-        for i, pair in enumerate(bucket):
-            if pair[0] == key:
-                del bucket[i]
-                return True  #Успішно видалено
-        return False  #Ключ не знайдено
-
-H = HashTable(5)
-H.insert("apple", 10)
-H.insert("orange", 20)
-H.insert("banana", 30)
-
-print(H.get("apple"))    #Виведе: 10
-H.delete("apple")        #Видалимо "apple"
-print(H.get("apple"))    #Виведе: None
-
-
+# Ступені вершин
+print("\n📊 Топ-10 найважливіших станцій за ступенем:")
+for station, degree in sorted(G.degree(), key=lambda x: x[1], reverse=True)[:10]:
+    print(f"{station}: {degree}")
