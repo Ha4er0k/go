@@ -46,5 +46,3 @@ print("\nТоп-10 найважливіших станцій за ступене
 for station, degree in sorted(G.degree(), key=lambda x: x[1], reverse=True)[:10]:
     print(f"{station}: {degree}")
 
-
-

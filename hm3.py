@@ -35,3 +35,5 @@ shortest_paths = dict(nx.all_pairs_dijkstra_path_length(G, weight='weight'))
 print("Найкоротший час від 'Isolatorweg' до інших станцій (в хвилинах):\n")
 for station, time in sorted(shortest_paths["Isolatorweg"].items(), key=lambda x: x[1]):
     print(f"{station}: {time} хв")
+
+
