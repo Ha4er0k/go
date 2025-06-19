@@ -1,7 +1,6 @@
 from collections import deque
 import networkx as nx
 
-# Підготуємо той самий граф, що й у Завданні 1
 G = nx.Graph()
 
 lines = {
@@ -29,7 +28,7 @@ for stations in lines.values():
     for i in range(len(stations) - 1):
         G.add_edge(stations[i], stations[i + 1])
 
-# Алгоритм DFS (рекурсивно)
+#алгоритм DFS (рекурсивно)
 def dfs_path(graph, start, goal, path=None, visited=None):
     if path is None:
         path = [start]
@@ -47,7 +46,7 @@ def dfs_path(graph, start, goal, path=None, visited=None):
                 return result
     return None
 
-# Алгоритм BFS (черга)
+#алгоритм BFS (черга)
 def bfs_path(graph, start, goal):
     visited = set()
     queue = deque([[start]])
@@ -64,16 +63,13 @@ def bfs_path(graph, start, goal):
                 queue.append(new_path)
     return None
 
-# Вхідні дані
 start_station = "Isolatorweg"
 end_station = "Gaasperplas"
 
-# Обчислення
 dfs_result = dfs_path(G, start_station, end_station)
 bfs_result = bfs_path(G, start_station, end_station)
 
-# Результати
-print("🔎 DFS шлях:")
-print(" → ".join(dfs_result))
-print("\n🔎 BFS шлях:")
-print(" → ".join(bfs_result))
+print("\nDFS шлях:")
+print("---".join(dfs_result))
+print("\nBFS шлях:")
+print("---".join(bfs_result))

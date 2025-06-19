@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 G = nx.Graph()
 
-# Реальні станції метро в Амстердамі згідно з офіційною схемою
+# Метро Амстердаму
 lines = {
     "50": ["Isolatorweg","Sloterdijk","De Vlugtlaan","Jan van Galenstraat",
            "Postjesweg","Lelylaan","Heemstedestraat","Henk Sneevlietweg",
@@ -25,23 +25,23 @@ lines = {
            "Holendrecht","Reigersbos","Gein"]
 }
 
-# Додавання ребер між послідовними станціями кожної лінії
+#додавання ребер між послідовними станціями кожної лінії
 for stations in lines.values():
     for i in range(len(stations) - 1):
         G.add_edge(stations[i], stations[i + 1])
 
-# 🔍 Візуалізація графа
+#візуалізація графа
 plt.figure(figsize=(16, 10))
 pos = nx.spring_layout(G, seed=42)
 nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray',
         node_size=400, font_size=8)
 plt.title("Мережа метро Амстердама (реальні станції)", fontsize=14)
 plt.show()
-# Базові метрики
-print("🔢 Кількість станцій:", G.number_of_nodes())
-print("🔗 Кількість з'єднань:", G.number_of_edges())
+#метрики
+print("Кількість станцій:", G.number_of_nodes())
+print("Кількість з'єднань:", G.number_of_edges())
 
-# Ступені вершин
-print("\n📊 Топ-10 найважливіших станцій за ступенем:")
+#ступені вершин
+print("\nТоп-10 найважливіших станцій за ступенем:")
 for station, degree in sorted(G.degree(), key=lambda x: x[1], reverse=True)[:10]:
     print(f"{station}: {degree}")
