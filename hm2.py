@@ -73,3 +73,6 @@ print("\nDFS шлях:")
 print("---".join(dfs_result))
 print("\nBFS шлях:")
 print("---".join(bfs_result))
+
+
+
