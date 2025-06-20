@@ -1,6 +1,6 @@
-import networkx as nx
+import heapq
 
-G = nx.Graph()
+graph = {}
 
 lines = {
     "50": ["Isolatorweg","Sloterdijk","De Vlugtlaan","Jan van Galenstraat",
@@ -23,17 +23,35 @@ lines = {
            "Holendrecht","Reigersbos","Gein"]
 }
 
-#додавання ребра з вагою (2 хв між сусідніми станціями)
 for stations in lines.values():
     for i in range(len(stations) - 1):
-        G.add_edge(stations[i], stations[i + 1], weight=2)
+        u, v = stations[i], stations[i + 1]
+        graph.setdefault(u, {})[v] = 2
+        graph.setdefault(v, {})[u] = 2
 
-#Алгоритм Дейкстри - найкоротші шляхи між усіма вершинами
-shortest_paths = dict(nx.all_pairs_dijkstra_path_length(G, weight='weight'))
+def dijkstra(graph, start):
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
+    visited = set()
+    heap = [(0, start)]
 
-#приклад: час від Isolatorweg до всіх станцій
-print("Найкоротший час від 'Isolatorweg' до інших станцій (в хвилинах):\n")
-for station, time in sorted(shortest_paths["Isolatorweg"].items(), key=lambda x: x[1]):
+    while heap:
+        current_distance, current_node = heapq.heappop(heap)
+
+        if current_node in visited:
+            continue
+        visited.add(current_node)
+
+        for neighbor, weight in graph[current_node].items():
+            distance = current_distance + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(heap, (distance, neighbor))
+
+    return distances
+
+shortest_from_isolatorweg = dijkstra(graph, "Isolatorweg")
+
+print("Найкоротші шляхи від станції 'Isolatorweg':\n")
+for station, time in sorted(shortest_from_isolatorweg.items(), key=lambda x: x[1]):
     print(f"{station}: {time} хв")
-
-
