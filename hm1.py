@@ -1,32 +1,25 @@
-class Node:
-    def __init__(self, key):
-        self.key = key
-        self.left = None
-        self.right = None
+import heapq
 
-#функція вставки (для створення BST)
-def insert(root, key):
-    if root is None:
-        return Node(key)
-    if key < root.key:
-        root.left = insert(root.left, key)
-    else:
-        root.right = insert(root.right, key)
-    return root
+def min_connection_cost(cables):
+    heapq.heapify(cables)
+    total_cost = 0
+    steps = []
 
-#функція для знаходження найбільшого значення в BST або AVL-дереві
-def find_max(root):
-    if root is None:
-        return None  
-    current = root
-    while current.right is not None:
-        current = current.right
-    return current.key
+    while len(cables) > 1:
+        first = heapq.heappop(cables)
+        second = heapq.heappop(cables)
+        combined = first + second
+        total_cost += combined
+        steps.append(f"З'єднуємо {first} + {second} = {combined}")
+        heapq.heappush(cables, combined)
+
+    print("Послідовність з'єднань:")
+    for step in steps:
+        print(step)
+    print(f"\nЗагальні витрати: {total_cost}")
+
+    return total_cost
 
 if __name__ == "__main__":
-    root = None
-    values = [15, 10, 20, 8, 12, 17, 25]
-    for val in values:
-        root = insert(root, val)
-    
-    print("Найбільше значення у дереві:", find_max(root))
+    cables = [4, 3, 2, 6]
+    min_connection_cost(cables)
