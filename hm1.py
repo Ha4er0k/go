@@ -45,3 +45,4 @@ def test_change_algorithms(amount: int):
     print(f"Динамічний результат: {dp_result}, час: {dp_time:.6f} с\n")
 
 test_change_algorithms(333)  #можна змінити на будь-яке число 
+
