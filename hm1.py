@@ -1,25 +1,47 @@
-import heapq
+from typing import Dict
+from collections import defaultdict
 
-def min_connection_cost(cables):
-    heapq.heapify(cables)
-    total_cost = 0
-    steps = []
+#список доступних монет
+coins = [50, 25, 10, 5, 2, 1]
 
-    while len(cables) > 1:
-        first = heapq.heappop(cables)
-        second = heapq.heappop(cables)
-        combined = first + second
-        total_cost += combined
-        steps.append(f"З'єднуємо {first} + {second} = {combined}")
-        heapq.heappush(cables, combined)
+#жадібний алгоритм
+def find_coins_greedy(amount: int) -> Dict[int, int]:
+    result = {}
+    for coin in coins:
+        if amount >= coin:
+            count = amount // coin
+            amount -= coin * count
+            result[coin] = count
+    return result
 
-    print("Послідовність з'єднань:")
-    for step in steps:
-        print(step)
-    print(f"\nЗагальні витрати: {total_cost}")
+#динамічне програмування
+def find_min_coins(amount: int) -> Dict[int, int]:
+    dp = [(float('inf'), {}) for _ in range(amount + 1)]
+    dp[0] = (0, {})
 
-    return total_cost
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if i >= coin:
+                prev_count, prev_combo = dp[i - coin]
+                if prev_count + 1 < dp[i][0]:
+                    new_combo = prev_combo.copy()
+                    new_combo[coin] = new_combo.get(coin, 0) + 1
+                    dp[i] = (prev_count + 1, new_combo)
+    return dp[amount][1]
 
-if __name__ == "__main__":
-    cables = [4, 3, 2, 6]
-    min_connection_cost(cables)
+def test_change_algorithms(amount: int):
+    import time
+
+    start = time.time()
+    greedy_result = find_coins_greedy(amount)
+    greedy_time = time.time() - start
+
+    start = time.time()
+    dp_result = find_min_coins(amount)
+    dp_time = time.time() - start
+
+    print(f"Сума: {amount}\n")
+    print(f"Жадібний результат: {greedy_result}, час: {greedy_time:.6f} с\n")
+    print(f"Динамічний результат: {dp_result}, час: {dp_time:.6f} с\n")
+
+test_change_algorithms(333)  #можна змінити на будь-яке число 
