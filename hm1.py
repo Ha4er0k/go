@@ -1,48 +1,23 @@
-from typing import Dict
-from collections import defaultdict
+import pulp
 
-#список доступних монет
-coins = [50, 25, 10, 5, 2, 1]
+#створення задачі лінійного програмування (максимізація)
+model = pulp.LpProblem("Maximize_Production", pulp.LpMaximize)
 
-#жадібний алгоритм
-def find_coins_greedy(amount: int) -> Dict[int, int]:
-    result = {}
-    for coin in coins:
-        if amount >= coin:
-            count = amount // coin
-            amount -= coin * count
-            result[coin] = count
-    return result
+#змінні рішень: кількість лимонаду (x) та фруктового соку (y)
+x = pulp.LpVariable("Lemonade", lowBound=0, cat='Integer')
+y = pulp.LpVariable("Fruit_Juice", lowBound=0, cat='Integer')
 
-#динамічне програмування
-def find_min_coins(amount: int) -> Dict[int, int]:
-    dp = [(float('inf'), {}) for _ in range(amount + 1)]
-    dp[0] = (0, {})
+#цільова функція: максимізувати загальну кількість напоїв
+model += x + y, "Total_Products"
 
-    for i in range(1, amount + 1):
-        for coin in coins:
-            if i >= coin:
-                prev_count, prev_combo = dp[i - coin]
-                if prev_count + 1 < dp[i][0]:
-                    new_combo = prev_combo.copy()
-                    new_combo[coin] = new_combo.get(coin, 0) + 1
-                    dp[i] = (prev_count + 1, new_combo)
-    return dp[amount][1]
+#обмеження на ресурси:
+model += 2 * x + 1 * y <= 100, "Water"
+model += 1 * x <= 50, "Sugar"
+model += 1 * x <= 30, "Lemon_Juice"
+model += 2 * y <= 40, "Fruit_Puree"
+model.solve()
 
-def test_change_algorithms(amount: int):
-    import time
-
-    start = time.time()
-    greedy_result = find_coins_greedy(amount)
-    greedy_time = time.time() - start
-
-    start = time.time()
-    dp_result = find_min_coins(amount)
-    dp_time = time.time() - start
-
-    print(f"Сума: {amount}\n")
-    print(f"Жадібний результат: {greedy_result}, час: {greedy_time:.6f} с\n")
-    print(f"Динамічний результат: {dp_result}, час: {dp_time:.6f} с\n")
-
-test_change_algorithms(333)  #можна змінити на будь-яке число 
-
+print("Status:", pulp.LpStatus[model.status])
+print("Кількість лимонаду:", int(x.varValue))
+print("Кількість фруктового соку:", int(y.varValue))
+print("Загальна кількість напоїв:", int(x.varValue + y.varValue))
