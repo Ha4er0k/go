@@ -1,26 +1,43 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.integrate import quad
+import turtle
+import math
 
-#функція для інтегрування
-def f(x):
-    return x ** 2
+def draw_pythagoras_tree(t, branch_length, level, angle=45):
+    if level == 0:
+        return
+    t.forward(branch_length)
+    x, y = t.position()
+    heading = t.heading()
+    t.left(angle)
+    draw_pythagoras_tree(t, branch_length * math.cos(math.radians(angle)), level - 1, angle)
+    t.penup()
+    t.setposition(x, y)
+    t.setheading(heading)
+    t.pendown()
+    t.right(angle)
+    draw_pythagoras_tree(t, branch_length * math.sin(math.radians(angle)), level - 1, angle)
+    t.penup()
+    t.setposition(x, y)
+    t.setheading(heading)
+    t.pendown()
 
-#межі інтегрування
-a = 0
-b = 2
+def main():
+    level = int(input("Введіть рівень рекурсії (наприклад, 6): "))
 
-#кількість випадкових точок
-N = 100_000
+    screen = turtle.Screen()
+    screen.bgcolor("white")
+    t = turtle.Turtle()
+    t.color("brown")
+    t.speed(0)
+    t.left(90)
 
-#метод Монте-Карло
-x_rand = np.random.uniform(a, b, N)
-y_rand = f(x_rand)
-integral_mc = (b - a) * np.mean(y_rand)
+    t.penup()
+    t.goto(0, -250)
+    t.pendown()
 
-print(f"Інтеграл методом Монте-Карло: {integral_mc:.6f}\n")
+    draw_pythagoras_tree(t, 100, level)
+    t.hideturtle()
+    screen.exitonclick()
 
-#точне значення для порівняння
-result, error = quad(f, a, b)
-print(f"Інтеграл функцією quad: {result:.6f}, похибка: {error:.2e}\n")
-print(f"Абсолютна різниця: {abs(integral_mc - result):.6f}\n")
+if __name__ == "__main__":
+    main()
+
